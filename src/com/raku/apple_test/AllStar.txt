@@ -1,0 +1,508 @@
+﻿=== AbstractApple.java ===
+package com.youshi.apple_test.abstract_apple;
+
+public abstract class AbstractApple {
+    private final int weight; // 蜈ｱ騾壹ヵ繧｣繝ｼ繝ｫ繝・
+
+    public AbstractApple(int weight) {
+        if (weight <= 0)
+            throw new IllegalArgumentException("驥阪＆縺ｯ豁｣縺ｮ謨ｰ縺ｧ縺ｪ縺上※縺ｯ縺・￠縺ｾ縺帙ｓ");
+        this.weight = weight;
+    }
+
+    public int getWeight() { //蜈ｷ菴薙Γ繧ｽ繝・ラ
+        return weight;
+    }
+
+    public abstract void eat(); //謚ｽ雎｡繝｡繧ｽ繝・ラ・医し繝悶け繝ｩ繧ｹ縺ｧ蠢・★螳溯｣・ｼ・
+
+    public String describe(){
+        return "驥阪＆:" + weight + "g";
+    }
+}
+=== AppleAbstract.java ===
+package com.youshi.apple_test.abstract_class;
+
+import com.youshi.apple_test.abstract_apple.AbstractApple;
+
+public class AppleAbstract extends AbstractApple {
+    private final String taste;
+
+    public AppleAbstract(int weight, String taste){
+        super(weight); //謚ｽ雎｡繧ｯ繝ｩ繧ｹ縺ｮ繧ｳ繝ｳ繧ｹ繝医Λ繧ｯ繧ｿ繧貞他縺ｶ
+        this.taste = taste;
+    }
+
+    @Override
+    public void eat(){ //蠢・医・螳溯｣・
+        System.out.println(getWeight() + "g 縺ｮ繧翫ｓ縺斐ｒ鬟溘∋縺溘ょ袖縺ｯ" + taste);
+    }
+
+    public String setTaste(){
+        return taste;
+    }
+}
+=== Main1Abstract.java ===
+package com.youshi.apple_test.abstract_class;
+
+import com.youshi.apple_test.abstract_apple.AbstractApple;
+
+public class Main1Abstract {
+    public static void main(String[] args){
+        AbstractApple a;
+
+        a = new AppleAbstract(150, "逕倥＞");
+        a.eat();
+        System.out.println(a.describe());
+    }
+}
+=== AppleAllArgument.java ===
+package com.youshi.apple_test.all_argument;
+
+import com.youshi.apple_test.all_argument.apple_interface.AppleInterface;
+import com.youshi.apple_test.all_argument.enum_color.AppleColor;
+
+public class AppleAllArgument implements AppleInterface {
+    //private String color; -> AppleColor 繧ｯ繝ｩ繧ｹ縺ｮenum 繧貞盾辣ｧ縺吶ｋ縺ｮ縺ｫ螟画峩
+    private AppleColor color;
+    private int weight;
+    private int ate;
+    private String taste;
+
+    // 繧ｳ繝ｳ繧ｹ繝医Λ繧ｯ繧ｿ
+    public AppleAllArgument(AppleColor color, int weight, int ate, String taste){
+        setColor(color);
+        setAte(ate);
+        setWeight(weight);
+        setTaste(taste);
+    }
+
+    //setter: 荳肴ｭ｣縺ｪ繧我ｾ句､悶ｒ謚輔￡繧・    public void setColor(AppleColor color){
+        if (color == null){
+            throw new IllegalArgumentException("濶ｲ縺ｯnull 縺ｫ縺ｧ縺阪∪縺帙ｓ縲・);
+        }
+        this.color = color;
+    }
+
+    public void setAte(int ate){
+        if (ate > 150){
+            throw new IllegalArgumentException("鬟溘∋繧矩㍼縺ｯ繝ｪ繝ｳ繧ｴ縺ｮ驥上ｒ荳雁屓繧後∪縺帙ｓ縲・);
+        }
+        this.ate = ate;
+    }
+
+    // setter: 荳肴ｭ｣蛟､縺ｪ繧我ｾ句､悶ｒ謚輔￡繧・    public void setWeight(int weight) {
+        if (weight < 0) {
+            throw new IllegalArgumentException("驥阪＆縺ｯ豁｣縺ｮ謨ｰ縺ｧ縺ｪ縺代ｌ縺ｰ縺・￠縺ｾ縺帙ｓ"); // throw 縺ｮ蛻ｩ逕ｨ萓・        }
+        this.weight = weight;
+    }
+
+    public void setTaste(String taste) {
+        this.taste = taste;
+    }
+
+    // int: 謌ｻ繧雁､縺梧紛謨ｰ
+    public int getRemainingWeight() {
+        return weight - ate; // return 縺ｮ蛻ｩ逕ｨ萓・    }
+
+    public int getAte(){
+        return ate;
+    }
+
+    public String getTaste(){
+        return taste;
+    }
+
+    // String: 謌ｻ繧雁､縺梧枚蟄怜・
+    public String getColor() {
+        return color.getLabel();
+    }
+
+    // boolean: 逵溷⊃蛟､繧定ｿ斐☆
+    public boolean isHeavy() {
+        return weight > 200; // 200g 繧医ｊ驥阪＞縺九←縺・°
+    }
+
+    // void: 蛟､繧定ｿ斐＆縺ｪ縺・Γ繧ｽ繝・ラ
+    public void eat() {
+        System.out.println(weight + "g 縺ｮ " + color.getLabel() + " 縺ｮ繝ｪ繝ｳ繧ｴ繧帝｣溘∋縺溘・);
+    }
+}
+=== Main1AllArgument.java ===
+package com.youshi.apple_test.all_argument;
+
+import com.youshi.apple_test.all_argument.enum_color.AppleColor;
+
+public class Main1AllArgument {
+    public static void main(String[] args){
+        AppleAllArgument redApple = new AppleAllArgument(AppleColor.RED, 150,50,"逕倥＞");
+
+        // void 繝｡繧ｽ繝・ラ蜻ｼ縺ｳ蜃ｺ縺・
+        redApple.eat();
+
+        // int 謌ｻ繧雁､
+        int w = redApple.getRemainingWeight();
+        System.out.println(redApple.getAte() + "g 鬟溘∋縺溘・縺ｧ縲∵ｮ九ｊ縺ｮ驥阪＆縺ｯ " + w + "g 縺ｧ縺吶・);
+        System.out.println("縺薙・繝ｪ繝ｳ繧ｴ縺ｯ" + redApple.getTaste() + "蜻ｳ縺ｧ縺吶・);
+
+        // boolean 謌ｻ繧雁､
+        if (redApple.isHeavy()) {
+            System.out.println("縺薙・繝ｪ繝ｳ繧ｴ縺ｯ驥阪＞縺ｧ縺吶・);
+        } else if (!redApple.isHeavy()) {
+            System.out.println("縺薙・繝ｪ繝ｳ繧ｴ縺ｯ譎ｮ騾壹・驥阪＆縺ｧ縺吶・);
+        }
+
+        // String 謌ｻ繧雁､ -> AppleColor 謌ｻ繧雁､縺ｫ螟画峩
+        redApple.setColor(AppleColor.GREEN);
+        System.out.println("閻舌▲縺溷ｾ後・濶ｲ: " + redApple.getColor());
+    }
+}
+=== AppleInterface.java ===
+package com.youshi.apple_test.all_argument.apple_interface;
+
+public interface AppleInterface {
+    void eat();
+    int getRemainingWeight();
+    int getAte();
+    String getColor();
+    boolean isHeavy();
+    String getTaste();
+}
+=== AppleColor.java ===
+package com.youshi.apple_test.all_argument.enum_color;
+
+@SuppressWarnings("UnnecessaryModifier")
+public enum AppleColor {
+    RED("襍､"),
+    BLUE("髱・),
+    GREEN("邱・);
+
+    private final String label;
+
+    private AppleColor(String label){
+        this.label = label;
+    }
+
+    public String getLabel(){
+        return label;
+    }
+}
+=== Main1Argument.java ===
+package com.youshi.apple_test.argument;
+
+public class Main1Argument {
+    public static void main(String[] args){
+        System.out.println("Argument :" + args.length);
+        for (int i = 0; i < args.length; i++){
+            System.out.println("args[" + i + "] = " + args[i]);
+        }
+    }
+}
+=== AppleBasic.java ===
+package com.youshi.apple_test.basic;
+
+public class AppleBasic {
+    public String color;
+    public int  weight;
+
+    public AppleBasic(String color, int weight) {
+        this.color = color;
+        this.weight = weight;
+    }
+
+    public void eat(){
+        System.out.println(weight + "g 縺ｮ" + color + "縺ｮ繧翫ｓ縺斐ｒ鬟溘∋縺溘・);
+    }
+
+    public static void main(String[] args){
+        AppleBasic redApple = new AppleBasic("襍､",150);
+        redApple.eat();
+    }
+}
+=== Main1Basic.java ===
+package com.youshi.apple_test.basic;
+
+public class Main1Basic {
+    public static void main(String[] args){
+        AppleBasic redApple = new AppleBasic("襍､",150);
+        redApple.eat();
+    }
+}
+=== AppleContain.java ===
+package com.youshi.apple_test.contain;
+
+public class AppleContain {
+    // static繝｡繧ｽ繝・ラ・医け繝ｩ繧ｹ縺ｫ逶ｴ謗･縺上▲縺､縺・※縺・ｋ・・
+    public static void eat() {
+        System.out.println("襍､縺ｮ繝ｪ繝ｳ繧ｴ繧帝｣溘∋縺滂ｼ・);
+    }
+
+    public static void main(String[] args) {
+        AppleContain.eat(); // new 縺励↑縺上※繧ょ他縺ｹ繧具ｼ・
+    }
+}
+=== AppleInstanceAndStatic.java ===
+package com.youshi.apple_test.instance_and_static;
+
+public class AppleInstanceAndStatic {
+    public int instanceNum = 0;
+    public static int staticNum = 0;
+}
+=== Main1InstanceAndStatic.java ===
+package com.youshi.apple_test.instance_and_static;
+
+public class Main1InstanceAndStatic {
+    public static void main(String[] args) {
+        // 繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ繧・縺､菴懊ｋ
+        AppleInstanceAndStatic apple1 = new AppleInstanceAndStatic();
+        AppleInstanceAndStatic apple2 = new AppleInstanceAndStatic();
+
+        // 繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ繝輔ぅ繝ｼ繝ｫ繝峨・繧ｪ繝悶ず繧ｧ繧ｯ繝医＃縺ｨ縺ｫ迢ｬ遶・
+        apple1.instanceNum = 5;
+        apple2.instanceNum = 10;
+
+        System.out.println("apple1.instanceNum = " + apple1.instanceNum); // 5
+        System.out.println("apple2.instanceNum = " + apple2.instanceNum); // 10
+
+        // static 繝輔ぅ繝ｼ繝ｫ繝峨・繧ｯ繝ｩ繧ｹ蜈ｨ菴薙〒蜈ｱ譛・
+        apple1.staticNum = 100;
+        System.out.println("apple1.StaticNum = " + apple1.staticNum);
+
+        // 繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ邨檎罰縺ｧ繧ょ酔縺・static 繝輔ぅ繝ｼ繝ｫ繝峨↓繧｢繧ｯ繧ｻ繧ｹ縺ｧ縺阪ｋ・域耳螂ｨ縺ｯ繧ｯ繝ｩ繧ｹ蜷咲ｵ檎罰・・
+        apple2.staticNum = 200;
+        System.out.println("apple1.StaticNum = " + apple1.staticNum);
+        System.out.println("apple2.StaticNum = " + apple2.staticNum);
+    }
+}
+=== AppleInteractive.java ===
+package com.youshi.apple_test.interactive;
+
+/**
+import com.youshi.apple_test.all_argument.enum_color.AppleColor;
+
+public class AppleInteractive {
+    //private String color; -> AppleColor 繧ｯ繝ｩ繧ｹ縺ｮenum 繧貞盾辣ｧ縺吶ｋ縺ｮ縺ｫ螟画峩
+    private AppleColor color;
+    private int weight;
+    private int ate;
+
+    // 繧ｳ繝ｳ繧ｹ繝医Λ繧ｯ繧ｿ
+    public AppleInteractive(AppleColor color, int weight, int ate){
+        setColor(color);
+        setAte(ate);
+        setWeight(weight);
+    }
+
+    //setter: 荳肴ｭ｣縺ｪ繧我ｾ句､悶ｒ謚輔￡繧・
+    public void setColor(AppleColor color){
+        if (color == null){
+            throw new IllegalArgumentException("濶ｲ縺ｯnull 縺ｫ縺ｧ縺阪∪縺帙ｓ縲・);
+        }
+        this.color = color;
+    }
+
+    public void setAte(int ate){
+        this.ate = ate;
+    }
+
+    // setter: 荳肴ｭ｣蛟､縺ｪ繧我ｾ句､悶ｒ謚輔￡繧・
+    public void setWeight(int weight) {
+        if (weight < 0) {
+            throw new IllegalArgumentException("驥阪＆縺ｯ豁｣縺ｮ謨ｰ縺ｧ縺ｪ縺代ｌ縺ｰ縺・￠縺ｾ縺帙ｓ"); // throw 縺ｮ蛻ｩ逕ｨ萓・
+        }
+        this.weight = weight;
+    }
+
+    // int: 謌ｻ繧雁､縺梧紛謨ｰ
+    public int getRemainingWeight() {
+        return weight - ate; // return 縺ｮ蛻ｩ逕ｨ萓・
+    }
+
+    public int getAte(){
+        return ate;
+    }
+
+    // String: 謌ｻ繧雁､縺梧枚蟄怜・
+    public String getColor() {
+        return color.getLabel();
+    }
+}
+
+ */
+=== MainInteractive.java ===
+
+package com.youshi.apple_test.interactive;
+
+/**
+
+import com.youshi.apple_test.all_argument.enum_color.AppleColor;
+
+import java.util.Scanner;
+
+public class MainInteractive {
+    public static void main(String[] args){
+        Scanner scanner = new Scanner(System.in);
+
+        AppleInteractive redApple = new AppleInteractive(AppleColor.RED, 150,0);
+
+        while (true){
+            System.out.println("迴ｾ蝨ｨ縺ｮ繧翫ｓ縺斐・驥擾ｼ・ + redApple.getRemainingWeight());
+            System.out.println("鬟溘∋縺溘＞驥・>>");
+            String input = scanner.nextLine();
+
+            //cancel 蜈･蜉・
+            if (input.equalsIgnoreCase("cancel")){
+                redApple.setColor(AppleColor.GREEN);
+                System.out.println("繧翫ｓ縺斐・謾ｾ鄂ｮ縺輔ｌ縺ｦ縲∬・縺｣縺ｦ縺励∪縺・∪縺励◆縲り・縺｣縺溷ｾ後・濶ｲ・・ + redApple.getColor());
+                break;
+            }
+
+            int ate;
+            try{
+                ate = Integer.parseInt(input);
+            }catch(NumberFormatException e){
+                System.out.println("謨ｰ蛟､縺・ cancel '繧貞・蜉帙＠縺ｦ縺上□縺輔＞縲・);
+                continue;
+            }
+
+            redApple.setAte(redApple.getAte() + ate);
+            int remaining = redApple.getRemainingWeight();
+
+            if (remaining > 0){
+                System.out.println("繝ｪ繝ｳ繧ｴ縺ｯ縺ｾ縺谿九▲縺ｦ縺・∪縺吶よｮ九＆縺夐｣溘∋縺ｾ縺吶°・滓ｮ九☆縺ｪ繧・ cancel '繧貞・蜉帙＠縺ｦ縺上□縺輔＞縲・);
+            } else if (remaining == 0) {
+                System.out.println("繧翫ｓ縺斐ｒ鬟溘∋縺阪ｊ縺ｾ縺励◆縲・);
+                break;
+            } else {
+                System.out.println("谿句ｿｵ縺ｪ縺後ｉ縲∬ｲｴ譁ｹ縺碁｣溘∋縺溘°縺｣縺溘ｊ繧薙＃縺ｮ驥上′" + (-remaining) + "g 雜ｳ繧翫↑縺九▲縺溘ｈ縺・〒縺吶・);
+                System.out.print("繧翫ｓ縺斐ｒ繧ゅ▲縺ｨ鬟溘∋縺溘＞縺ｧ縺吶°縲・es/exit >>");
+                String choice = scanner.nextLine();
+                if (choice.equalsIgnoreCase("Yes")) {
+                    System.out.println("鬟溘∋縺溘＞繧翫ｓ縺斐・濶ｲ縺ｨ驥阪＆繧呈蕗縺医※縺上□縺輔＞縲・);
+
+                    System.out.print("RED(襍､)縺ｾ縺溘・BLUE(髱・縺ｾ縺溘・GREEN(邱・>>");
+                    try {
+                        //縺薙％縺ｫ縲√さ繝槭Φ繝峨Λ繧､繝ｳ縺九ｉ荳弱∴繧峨ｌ縺溽黄縺後、ppleColor 縺ｮenum 縺ｮ繝輔ぅ繝ｼ繝ｫ繝峨↓蟄伜惠縺吶ｋ迚ｩ縺九ｒ遒ｺ隱阪☆繧九・
+                    }catch (IllegalArgumentException e) {
+                        System.out.println("RED縺ｾ縺溘・BLUE縺ｾ縺溘・GREEN繧貞・蜉帙＠縺ｦ縺上□縺輔＞縲・);
+                        continue;
+                    }
+
+                    System.out.print("驥阪＆>>");
+                    try {
+                        //縺薙％縺ｧ縲∵欠螳壹＆繧後◆迚ｩ縺梧ｭ｣縺ｮ謨ｰ縺ｧ縺ゅｋ縺九ｒ遒ｺ隱阪☆繧九・
+                    }catch (IllegalArgumentException e){
+                        System.out.println("驥阪＆縺ｫ縺ｯ豁｣縺ｮ縺ｿ縺御ｽｿ逕ｨ縺ｧ縺阪∪縺吶・);
+                        continue;
+                    }
+
+                    redApple = new AppleInteractive(colorChoice,weightChoice,0); //colorChoice 縺ｨweightChoice 縺ｯ縲》ry 縺ｧ豁｣蟶ｸ縺ｫ縺ｧ縺阪◆繧ゅ・繧貞ｼ墓焚縺ｫ謖・ｮ壹☆繧九・
+                    System.out.println("譁ｰ縺溘↓" + redApple.getColor() + "濶ｲ縺ｮ" + redApple.getRemainingWeight() + "g 縺ｮ繧翫ｓ縺斐ｒ菴懊ｊ縺ｾ縺励◆縲る｣溘∋縺溘＞驥上ｒ縺ｾ縺溷・蜉帙＠縺ｦ縺上□縺輔＞縲・);
+                } else {
+                    System.out.println("縺翫＠縺ｾ縺・・);
+                    break;
+                }
+            }
+        }
+        scanner.close();
+    }
+}
+
+ */
+=== AppleNonConstructor.java ===
+package com.youshi.apple_test.non_constructor;
+
+public class AppleNonConstructor {
+    String color;
+    int weight;
+
+    public AppleNonConstructor(String color , int weight){
+        this.color = color;
+        this.weight = weight;
+    }
+}
+=== Main1NonConstructor.java ===
+package com.youshi.apple_test.non_constructor;
+
+public class Main1NonConstructor {
+    public static void main(String[] args){
+        AppleNonConstructor Apple = new AppleNonConstructor("襍､",150);
+        System.out.println(Apple.color);
+        System.out.println(Apple.weight);
+    }
+}
+=== AppleObject.java ===
+package com.youshi.apple_test.object;
+
+public class AppleObject {
+    public void printSelf(){
+        System.out.println(this);
+    }
+}
+=== Main1Object.java ===
+package com.youshi.apple_test.object;
+
+public class Main1Object {
+    public static void main(String[] args){
+        AppleObject a = new AppleObject();
+        a.printSelf();
+    }
+}
+=== AppleSetter.java ===
+package com.youshi.apple_test.setter;
+
+public class AppleSetter {
+    private final String color;
+    private int weight;
+
+    public AppleSetter(String color, int weight){
+        this.color = color;
+        setWeight(weight); // 繧ｳ繝ｳ繧ｹ繝医Λ繧ｯ繧ｿ縺ｧ繧ゆｸ榊､画擅莉ｶ繧帝←逕ｨ
+    }
+
+    public void setWeight(int weight){
+        if (weight <= 0){
+            throw new IllegalArgumentException("驥阪＆縺ｯ豁｣縺ｮ謨ｰ縺ｧ縺ｪ縺代ｌ縺ｰ縺・￠縺ｾ縺帙ｓ");
+        }
+        this.weight = weight;
+    }
+
+    public void eat() {
+        System.out.println(weight + "g 縺ｮ" + color + "縺ｮ繧翫ｓ縺斐ｒ鬟溘∋縺溘・);
+    }
+}
+=== Main1Setter.java ===
+package com.youshi.apple_test.setter;
+
+public class Main1Setter {
+    public static void main(String[] args){
+        AppleSetter redApple = new AppleSetter("襍､",150);
+        redApple.eat();
+    }
+}
+=== AppleVoid.java ===
+package com.youshi.apple_test.the_void;
+
+public class AppleVoid {
+    public String color;
+    public int weight;
+
+    public AppleVoid(String color, int weight) { // 竊・縺薙％縺悟ｼ墓焚
+        this.color = color;
+        this.weight = weight;
+    }
+
+    public void eat(int bite) { // 竊・bite 縺悟ｼ墓焚
+        weight -= bite;
+        System.out.println(color + "縺ｮ繧翫ｓ縺斐ｒ" + bite + "g 鬟溘∋縺溘よｮ九ｊ " + weight + "g");
+    }
+}
+=== Main1Void.java ===
+package com.youshi.apple_test.the_void;
+
+public class Main1Void {
+    public static void main(String[] args){
+        AppleVoid redApple = new AppleVoid("襍､",150);
+        redApple.eat(50);
+    }
+}

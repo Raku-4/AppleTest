@@ -1,0 +1,5 @@
+timestamp,foodName,labeledId,zone
+"2026-04-12T18:09:40.7890362","apple","[F]apple","果樹園"
+"2026-04-12T18:09:40.7890362","banana","[F]banana","果樹園"
+"2026-04-12T18:09:40.7890362","onion","[V]onion","畑"
+"2026-04-12T18:09:40.7890362","broccoli","[V]broccoli","畑"
