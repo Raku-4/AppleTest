@@ -1,4 +1,4 @@
-package java.com.raku.apple_test.map;
+package com.raku.apple_test.map;
 
 import java.util.*;
 

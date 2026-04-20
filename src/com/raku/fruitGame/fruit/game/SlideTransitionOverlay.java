@@ -2,6 +2,7 @@ package com.raku.fruitGame.fruit.game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 
 /**
  * 横方向にスライドする暗幕オーバーレイ。
@@ -9,6 +10,7 @@ import java.awt.Graphics2D;
  * <p>進行率 progress を 0.0 -> 1.0 で計算し、矩形の X 座標に変換します。</p>
  */
 public class SlideTransitionOverlay implements TransitionOverlay {
+    private static final String OVERLAY_TEXTURE = "assets/fruitGame/textures/misc/img.png";
     /** アニメーション継続時間 (ミリ秒) */
     private final long durationMillis;
 
@@ -18,11 +20,14 @@ public class SlideTransitionOverlay implements TransitionOverlay {
     /** start() が呼ばれた時刻。0 は未開始を意味します。 */
     private long startedAt;
 
+    private final Image overlayTexture;
+
     public SlideTransitionOverlay(long durationMillis, boolean leftToRight) {
         // 0 や負値が入ってもゼロ除算を避けるため最低1msに補正
         this.durationMillis = Math.max(1L, durationMillis);
         this.leftToRight = leftToRight;
         this.startedAt = 0L;
+        this.overlayTexture = AssetImageLoader.load(OVERLAY_TEXTURE);
     }
 
     @Override
@@ -68,7 +73,12 @@ public class SlideTransitionOverlay implements TransitionOverlay {
             x = (int) ((1.0 - progress) * width);
         }
 
-        // 半透明の黒を重ねて「切り替わり感」を作る
+        if (overlayTexture != null) {
+            g2.drawImage(overlayTexture, x, 0, width, height, null);
+            return;
+        }
+
+        // テクスチャが無い場合のみ半透明の黒で代替。
         g2.setColor(new Color(0, 0, 0, 120));
         g2.fillRect(x, 0, width, height);
     }

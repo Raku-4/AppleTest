@@ -7,7 +7,7 @@ public final class Fruit {
     private int weight;
     private int ate;
 
-    public Fruit(String name, String color, int weight) {
+    public Fruit(String name, String color, long l, int weight) {
         this.name = name;
         this.color = color;
         this.weight = weight;
