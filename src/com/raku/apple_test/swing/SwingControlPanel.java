@@ -28,9 +28,9 @@ import java.awt.FlowLayout;
  */
 public class SwingControlPanel extends JPanel {
     private static final String START_BUTTON = "assets/fruitGame/textures/main_menu/start_button.png";
-    private static final String START_BUTTON_PRESSED = "assets/fruitGame/textures/main_menu/start_button_sinked.png";
+    private static final String START_BUTTON_PRESSED = "assets/fruitGame/textures/main_menu/sunk_start_button.png";
     private static final String CONTINUE_BUTTON = "assets/fruitGame/textures/main_menu/continue_button.png";
-    private static final String CONTINUE_BUTTON_PRESSED = "assets/fruitGame/textures/main_menu/sinked_continue_button.png";
+    private static final String CONTINUE_BUTTON_PRESSED = "assets/fruitGame/textures/main_menu/sunk_continue_button.png";
     private static final String EXIT_BUTTON = "assets/fruitGame/textures/main_menu/exit_button.png";
     private static final String EXIT_BUTTON_PRESSED = "assets/fruitGame/textures/main_menu/sinked_exit_button.png";
 

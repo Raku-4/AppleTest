@@ -48,7 +48,6 @@ import java.util.Scanner;
  */
 public class MainInteractive {
 
-
     public static final List<String> fruitNames = new ArrayList<>();
         /*
         果物名のリスト。インデックス順が後の basket と一致する前提です。

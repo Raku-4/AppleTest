@@ -1,6 +1,9 @@
 package com.raku.fruitGame.fruit.functionalClass.utility;
 
 import com.raku.fruitGame.fruit.functionalClass.FruitRecord;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,13 +31,13 @@ public class FruitHistory {
      * キー: 果物名 (例: "りんご")
      * 値: その果物の履歴 (FruitRecord のリスト)
      */
-    private final Map<String, List<FruitRecord>> history = new LinkedHashMap<>();
+    private static final Map<String, List<FruitRecord>> history = new LinkedHashMap<>();
 
     /**
      * 指定した果物名の「入れ物」を必ず用意します。
      * すでに存在する場合は何もしません。
      */
-    public void ensureFruit(String fruitName) {
+    public static void ensureFruit(String fruitName) {
         history.computeIfAbsent(fruitName, key -> new ArrayList<>());
     }
 
@@ -42,7 +45,7 @@ public class FruitHistory {
      * 生成履歴を1件追加します。
      * 完全一致レコードは重複として無視します。
      */
-    public void recordCreation(String fruitName, String color, long weight) {
+    public static void recordCreation(String fruitName, String color, long weight) {
         ensureFruit(fruitName);
         FruitRecord record = new FruitRecord(fruitName, color, weight);
         List<FruitRecord> list = history.get(fruitName);
@@ -55,7 +58,7 @@ public class FruitHistory {
      * 指定果物の履歴を読み取り専用で返します。
      * 呼び出し側からの add/remove を防ぐため unmodifiableList を返します。
      */
-    public List<FruitRecord> getHistoryView(String fruitName) {
+    public static @NotNull @UnmodifiableView List<FruitRecord> getHistoryView(String fruitName) {
         List<FruitRecord> list = history.getOrDefault(fruitName, Collections.emptyList());
         return Collections.unmodifiableList(list);
     }
@@ -64,7 +67,7 @@ public class FruitHistory {
      * 全履歴を読み取り専用で返します。
      * Map 本体だけでなく、各 List も読み取り専用化して保護します。
      */
-    public Map<String, List<FruitRecord>> viewAll() {
+    public static @NotNull @UnmodifiableView Map<String, List<FruitRecord>> viewAll() {
         Map<String, List<FruitRecord>> readonly = new LinkedHashMap<>();
         for (Map.Entry<String, List<FruitRecord>> e : history.entrySet()) {
             readonly.put(e.getKey(), Collections.unmodifiableList(e.getValue()));
@@ -76,7 +79,7 @@ public class FruitHistory {
      * 履歴総件数を返します。
      * 各果物ごとのリストサイズを合算しています。
      */
-    public int size() {
+    public static int size() {
         int count = 0;
         for (List<FruitRecord> list : history.values()) {
             count += list.size();
@@ -88,7 +91,7 @@ public class FruitHistory {
      * 現在の履歴を CSV として保存します。
      * フォーマット: timestamp,fruitName,color,weight
      */
-    public void saveCsv(Path path) throws IOException {
+    public static void saveCsv(Path path) throws IOException {
         List<String> lines = new ArrayList<>();
         lines.add("timestamp,fruitName,color,weight");
 
@@ -114,7 +117,7 @@ public class FruitHistory {
     /**
      * fruitNames 同期が不要な呼び出し用オーバーロード。
      */
-    public void loadCsv(Path path) throws IOException {
+    public static void loadCsv(Path path) throws IOException {
         loadCsv(path, null);
     }
 
@@ -122,7 +125,7 @@ public class FruitHistory {
      * CSV を読み込み、履歴を再構築します。
      * fruitNames が渡された場合は、そこにも果物名を同期します。
      */
-    public void loadCsv(Path path, List<String> fruitNames) throws IOException {
+    public static void loadCsv(Path path, List<String> fruitNames) throws IOException {
         // 初回起動などでファイルがない場合は何もしません。
         if (!Files.exists(path)) {
             return;
@@ -168,7 +171,8 @@ public class FruitHistory {
      * <p>CSVのルール上、文字列内の " は "" にエスケープし、
      * 項目全体を "..." で囲みます。</p>
      */
-    private static String csv(String text) {
+    @Contract(pure = true)
+    private static @NotNull String csv(String text) {
         if (text == null) {
             return "\"\"";
         }
@@ -180,7 +184,7 @@ public class FruitHistory {
      * csv() の逆変換。
      * 前後の引用符を剥がし、"" を " に戻します。
      */
-    private static String unCsv(String text) {
+    private static @NotNull String unCsv(String text) {
         if (text == null || text.isEmpty()) {
             return "";
         }
@@ -197,7 +201,7 @@ public class FruitHistory {
      * <p>単純 split(",") を使わない理由:
      * 引用符内のカンマは区切りではなくデータ本体だからです。</p>
      */
-    private static List<String> splitCsv(String line) {
+    private static @NotNull List<String> splitCsv(@NotNull String line) {
         List<String> cols = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean quoted = false;

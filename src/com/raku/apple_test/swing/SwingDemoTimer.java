@@ -20,7 +20,7 @@ public class SwingDemoTimer {
     public SwingDemoTimer(SwingBackgroundPanel panel) {
         // 16ms ごとに repaint() すると、だいたい 60fps くらいの見た目になります。
         // 1000ms / 16ms ≒ 62.5 回/秒
-        this.timer = new Timer(16, event -> panel.repaint());
+        this.timer = new Timer(16, _ -> panel.repaint());
         this.timer.setRepeats(true);
     }
 

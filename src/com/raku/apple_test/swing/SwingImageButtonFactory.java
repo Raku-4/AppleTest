@@ -43,11 +43,11 @@ public final class SwingImageButtonFactory {
         if (normal != null) {
             // 通常画像があればアイコン化し、見た目を画像ボタン寄りに整える
             button.setIcon(new ImageIcon(normal.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
-            button.setText("");
-            button.setBorderPainted(false);
-            button.setContentAreaFilled(false);
-            button.setFocusPainted(false);
-            button.setOpaque(false);
+            button.setText(""); // アイコンがあるときはテキストは消す（画像だけで伝わるなら文字は不要）
+            button.setBorderPainted(false); // 枠なし
+            button.setContentAreaFilled(false); // 背景なし
+            button.setFocusPainted(false); // フォーカスの点線なし
+            button.setOpaque(false); // 不透明でない（背景を完全に透明にする）
         }
 
         if (pressed != null) {

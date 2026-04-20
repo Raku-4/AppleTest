@@ -62,12 +62,41 @@ public class SwingBackgroundPanel extends JPanel {
         this.demoTimer.stop();
     }
 
+    /**
+     * パネルの見た目を描くためのメソッドです。
+     *
+     * <p>【とても重要】</p>
+     * <ul>
+     *   <li>このメソッドは「自分で直接呼ぶ」ものではありません</li>
+     *   <li>Swing が必要なタイミングで自動的に呼びます</li>
+     *   <li>描き直したいときは {@code repaint()} を呼んで依頼します</li>
+     * </ul>
+     *
+     * <p>【呼ばれる主なタイミング】</p>
+     * <ul>
+     *   <li>ウィンドウを初めて表示したとき</li>
+     *   <li>ウィンドウサイズを変えたとき</li>
+     *   <li>別ウィンドウで隠れていた部分が再表示されたとき</li>
+     *   <li>{@code repaint()} を呼んだとき</li>
+     * </ul>
+     *
+     * <p>【このメソッド内の基本ルール】</p>
+     * <ol>
+     *   <li>{@code super.paintComponent(g)} を最初に呼ぶ（前フレームの残像を消す）</li>
+     *   <li>背景を描く</li>
+     *   <li>前景（今回はオーバーレイ）を重ねる</li>
+     *   <li>最後に作った Graphics を破棄する</li>
+     * </ol>
+     */
     @Override
     protected void paintComponent(Graphics g) {
+        // 親クラスの標準描画処理。ここを省くと残像やちらつきの原因になりやすい。
         super.paintComponent(g);
 
         // Graphics のコピーを使うと、このメソッド内の設定変更を局所化できます。
+        // （外側の Graphics 状態を汚さない）
         Graphics2D g2 = (Graphics2D) g.create();
+        // 線や文字のギザギザを減らして、見た目をなめらかにします（アンチエイリアス）。
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int width = getWidth();
@@ -93,6 +122,7 @@ public class SwingBackgroundPanel extends JPanel {
             }
         }
 
+        // create() で作った Graphics を解放する。
         g2.dispose();
     }
 }
