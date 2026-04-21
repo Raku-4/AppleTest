@@ -46,12 +46,92 @@ public class FruitHistory {
      * 完全一致レコードは重複として無視します。
      */
     public static void recordCreation(String fruitName, String color, long weight) {
+        recordCreation(fruitName, color, weight, "", "通常", 0L, -1);
+    }
+
+    public static void recordCreation(
+            String fruitName,
+            String color,
+            long weight,
+            String taste,
+            String maturity,
+            long elapsedSeconds,
+            int treeId
+    ) {
         ensureFruit(fruitName);
-        FruitRecord record = new FruitRecord(fruitName, color, weight);
+        FruitRecord record = new FruitRecord(fruitName, color, weight, taste, maturity, elapsedSeconds, treeId);
         List<FruitRecord> list = history.get(fruitName);
         if (!list.contains(record)) {
             list.add(record);
         }
+    }
+
+    public static void clearAll() {
+        history.clear();
+    }
+
+    public static void removeTreeRecord(int treeId) {
+        for (List<FruitRecord> list : history.values()) {
+            list.removeIf(record -> record.treeId() == treeId);
+        }
+        cleanupEmptyFruits();
+    }
+
+    public static FruitRecord findLatestBagRecord(String fruitName) {
+        List<FruitRecord> list = history.get(fruitName);
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        for (int i = list.size() - 1; i >= 0; i--) {
+            FruitRecord record = list.get(i);
+            if (record.treeId() < 0) {
+                return record;
+            }
+        }
+        return null;
+    }
+
+    public static void replaceLatestBagRecord(String fruitName, FruitRecord replacement) {
+        List<FruitRecord> list = history.get(fruitName);
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        for (int i = list.size() - 1; i >= 0; i--) {
+            FruitRecord record = list.get(i);
+            if (record.treeId() < 0) {
+                list.set(i, replacement);
+                return;
+            }
+        }
+    }
+
+    public static void removeLatestBagRecord(String fruitName) {
+        List<FruitRecord> list = history.get(fruitName);
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        for (int i = list.size() - 1; i >= 0; i--) {
+            FruitRecord record = list.get(i);
+            if (record.treeId() < 0) {
+                list.remove(i);
+                cleanupEmptyFruits();
+                return;
+            }
+        }
+        cleanupEmptyFruits();
+    }
+
+    public static void upsertTreeState(
+            int treeId,
+            String fruitName,
+            String color,
+            long weight,
+            String taste,
+            String maturity,
+            long elapsedSeconds
+    ) {
+        removeTreeRecord(treeId);
+        recordCreation(fruitName, color, weight, taste, maturity, elapsedSeconds, treeId);
     }
 
     /**
@@ -93,7 +173,7 @@ public class FruitHistory {
      */
     public static void saveCsv(Path path) throws IOException {
         List<String> lines = new ArrayList<>();
-        lines.add("timestamp,fruitName,color,weight");
+        lines.add("timestamp,fruitName,color,weight,taste,maturity,elapsedSeconds,treeId");
 
         // すべての行に同じ保存時刻を付与する設計
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
@@ -108,7 +188,11 @@ public class FruitHistory {
             lines.add(csv(timestamp) + ","
                     + csv(record.fruitName()) + ","
                     + csv(record.color()) + ","
-                    + record.weight());
+                    + record.weight() + ","
+                    + csv(record.taste()) + ","
+                    + csv(record.maturity()) + ","
+                    + record.elapsedSeconds() + ","
+                    + record.treeId());
         }
 
         Files.write(path, lines, StandardCharsets.UTF_8);
@@ -152,13 +236,30 @@ public class FruitHistory {
             String fruitName = unCsv(cols.get(1));
             String color = unCsv(cols.get(2));
             long weight;
+            String taste = "";
+            String maturity = "通常";
+            long elapsedSeconds = 0L;
+            int treeId = -1;
             try {
                 weight = Long.parseLong(unCsv(cols.get(3)));
             } catch (NumberFormatException ex) {
                 continue; // 数値変換不能な行はスキップ
             }
 
-            recordCreation(fruitName, color, weight);
+            if (cols.size() >= 8) {
+                taste = unCsv(cols.get(4));
+                maturity = unCsv(cols.get(5));
+                try {
+                    elapsedSeconds = Long.parseLong(unCsv(cols.get(6)));
+                } catch (NumberFormatException ignored) {
+                }
+                try {
+                    treeId = Integer.parseInt(unCsv(cols.get(7)));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            recordCreation(fruitName, color, weight, taste, maturity, elapsedSeconds, treeId);
             if (fruitNames != null && !fruitNames.contains(fruitName)) {
                 fruitNames.add(fruitName);
             }
@@ -232,5 +333,9 @@ public class FruitHistory {
 
         cols.add(current.toString());
         return cols;
+    }
+
+    private static void cleanupEmptyFruits() {
+        history.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().isEmpty());
     }
 }

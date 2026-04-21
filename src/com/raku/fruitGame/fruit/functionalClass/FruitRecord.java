@@ -10,5 +10,13 @@ package com.raku.fruitGame.fruit.functionalClass;
  * @param color 生成時の色
  * @param weight 生成時の重さ(g)
  */
-public record FruitRecord(String fruitName, String color, long weight) {
+public record FruitRecord(
+		String fruitName,
+		String color,
+		long weight,
+		String taste,
+		String maturity,
+		long elapsedSeconds,
+		int treeId
+) {
 }
