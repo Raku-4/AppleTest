@@ -1,5 +1,8 @@
 package com.raku.apple_test.swing;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.*;
 import java.util.Random;
 
@@ -82,7 +85,7 @@ public class SwingTransitionOverlay{
      *
      * null または古いサイズの場合は、ensureSpeedMap() で再計算されます。
      */
-    private float[][] speedMap;
+    private float[] @Nullable [] speedMap;
 
     /**
      * 【画面のタイル数（列と行）】
@@ -181,7 +184,7 @@ public class SwingTransitionOverlay{
      * @param height
      *        画面の高さ（ピクセル）例: 600
      */
-    public void paint(Graphics2D g2, int width, int height) {
+    public void paint(@NotNull Graphics2D g2, int width, int height) {
         // 【安全性チェック】
         // 1. startedAt == 0L：アニメーションがまだ start() されていない
         // 2. width <= 0 または height <= 0：画面がまだ初期化されていない

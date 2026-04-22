@@ -20,24 +20,22 @@ class FruitHistoryTest {
     @Test
     void saveAndLoadKeepsData() throws IOException {
         // 1) 保存元履歴を作る
-        FruitHistory h1 = new FruitHistory();
-        h1.recordCreation("りんご", "RED", 150L);
-        h1.recordCreation("ばなな", "YELLOW", 120L);
-        h1.recordCreation("りんご", "RED", 150L); // 重複行は無視される想定
+        FruitHistory.recordCreation("りんご", "RED", 150L);
+        FruitHistory.recordCreation("ばなな", "YELLOW", 120L);
+        FruitHistory.recordCreation("りんご", "RED", 150L); // 重複行は無視される想定
 
-        assertEquals(2, h1.size());
+        assertEquals(2, FruitHistory.size());
 
         // 2) CSV 保存できることを確認
-        h1.saveCsv(TEST_PATH);
+        FruitHistory.saveCsv(TEST_PATH);
         assertTrue(Files.exists(TEST_PATH));
 
         // 3) 新インスタンスで読み込み、内容一致を検証
-        FruitHistory h2 = new FruitHistory();
-        h2.loadCsv(TEST_PATH);
+        FruitHistory.loadCsv(TEST_PATH);
 
-        assertEquals(2, h2.size());
-        assertEquals(1, h2.getHistoryView("りんご").size());
-        assertEquals(150L, h2.getHistoryView("りんご").get(0).weight());
+        assertEquals(2, FruitHistory.size());
+        assertEquals(1, FruitHistory.getHistoryView("りんご").size());
+        assertEquals(150L, FruitHistory.getHistoryView("りんご").get(0).weight());
 
         // 4) 後始末
         Files.deleteIfExists(TEST_PATH);

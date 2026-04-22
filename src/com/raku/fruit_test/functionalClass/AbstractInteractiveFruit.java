@@ -51,7 +51,7 @@ public abstract class AbstractInteractiveFruit<E> implements FruitInterface<E> {
     }
 
     @Override
-    public String getColor() {
+    public @NotNull String getColor() {
         return colorLabel(color);
     }
 }

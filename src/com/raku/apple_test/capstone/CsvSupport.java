@@ -182,7 +182,7 @@ public final class CsvSupport {
         return "\"" + escaped + "\"";
     }
 
-    private static Zone resolveZone(@Nullable String zoneName) {
+    private static @NotNull Zone resolveZone(@Nullable String zoneName) {
         if (zoneName == null || zoneName.isEmpty()) {
             return MainCapstone.field;
         }
@@ -229,7 +229,7 @@ public final class CsvSupport {
                      .replace("\"\"","\"");
     }
 
-    public static void want2save(@NotNull Scanner scanner, Path path) {
+    public static void want2save(@NotNull Scanner scanner, @NotNull Path path) {
         System.out.println("Do you want to save the history to CSV? (y/n)");
         while (true) {
             String input = scanner.nextLine().trim().toLowerCase();

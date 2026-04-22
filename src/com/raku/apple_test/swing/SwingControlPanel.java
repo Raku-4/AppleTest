@@ -5,6 +5,7 @@
 package com.raku.apple_test.swing;
 
 import com.raku.fruitGame.interactive.MainInteractive;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -34,7 +35,7 @@ public class SwingControlPanel extends JPanel {
     private static final String EXIT_BUTTON = "assets/fruitGame/textures/main_menu/exit_button.png";
     private static final String EXIT_BUTTON_PRESSED = "assets/fruitGame/textures/main_menu/sinked_exit_button.png";
 
-    public SwingControlPanel(SwingBackgroundPanel backgroundPanel, JFrame frame) {
+    public SwingControlPanel(@NotNull SwingBackgroundPanel backgroundPanel, @NotNull JFrame frame) {
         // FlowLayout.LEFT: 左から順にボタンを並べるレイアウト
         setLayout(new FlowLayout(FlowLayout.LEFT));
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));

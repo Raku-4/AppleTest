@@ -1,11 +1,13 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 
 public class DemoTimer {
-    private final Timer timer;
+    private final @NotNull Timer timer;
 
-    public DemoTimer(Background backGround) {
+    public DemoTimer(@NotNull Background backGround) {
         this.timer = new Timer(16, event -> backGround.repaint());
         this.timer.setRepeats(true);
     }

@@ -4,6 +4,9 @@
  */
 package com.raku.apple_test.swing;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -29,9 +32,9 @@ public class SwingBackgroundPanel extends JPanel {
     // 読み込んだ背景画像。null のときは単色背景へフォールバックします。
     private final Image backgroundImage;
     // オーバーレイ描画中だけ動かすタイマー。
-    private final SwingDemoTimer demoTimer;
+    private final @NotNull SwingDemoTimer demoTimer;
     // 黒幕演出の描画オブジェクト。演出していないときは null。
-    private SwingTransitionOverlay overlay;
+    private @Nullable SwingTransitionOverlay overlay;
 
     public SwingBackgroundPanel() {
         // 背景をこのパネル側で全面描画するため不透明にします。
@@ -89,7 +92,7 @@ public class SwingBackgroundPanel extends JPanel {
      * </ol>
      */
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(@NotNull Graphics g) {
         // 親クラスの標準描画処理。ここを省くと残像やちらつきの原因になりやすい。
         super.paintComponent(g);
 

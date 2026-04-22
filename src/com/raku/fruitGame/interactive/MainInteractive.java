@@ -65,7 +65,7 @@ public class MainInteractive {
         ensureFruitName("ばなな");
     }
 
-    private static void saveHistory(@NotNull FruitHistory fruitHistory, Path path) {
+    private static void saveHistory(@NotNull FruitHistory fruitHistory, @NotNull Path path) {
         try {
             fruitHistory.saveCsv(path);
             System.out.println("\nデータを保存しました。");

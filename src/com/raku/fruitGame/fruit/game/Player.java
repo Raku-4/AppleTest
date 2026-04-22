@@ -1,11 +1,15 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * orchard 上を歩くプレイヤー描画と移動更新を担当します。
@@ -26,21 +30,26 @@ public class Player {
     private static final long WALK_FRAME_INTERVAL_MS = 500L;
     // プレイヤー表示サイズの倍率。
     private static final double PLAYER_SCALE = 0.65D;
+    private static final int MAX_HUNGER = 100;
+    private static final int MIN_HUNGER = 0;
+    private static final double HUNGER_DECAY_PER_SEC = 0.6D;
+    private static final double STARVING_SPEED_MULTIPLIER = 0.55D;
 
-    private final Image[] walkRightFrames;
-    private final Image[] walkLeftFrames;
+    private final Image @NotNull [] walkRightFrames;
+    private final Image @NotNull [] walkLeftFrames;
     private final Image frontFrame;
     private final Image backFrame;
     private final Image idleRightFrame;
     private final Image idleLeftFrame;
-    private List<Rectangle> blockedAreas = Collections.emptyList();
+    private @NotNull List<Rectangle> blockedAreas = Collections.emptyList();
 
     private double x = -1;
     private double y = -1;
     private int lastDrawW;
     private int lastDrawH;
 
-    private FruitState heldFruit;
+    private @Nullable FruitState heldFruit;
+    private double hunger = MAX_HUNGER;
 
     private int frameIndex;
     private long lastFrameSwitchAt;
@@ -51,7 +60,7 @@ public class Player {
     private boolean moveUp;
     private boolean moveDown;
 
-    private Direction facing = Direction.RIGHT;
+    private @NotNull Direction facing = Direction.RIGHT;
 
     private enum Direction {
         LEFT,
@@ -93,11 +102,11 @@ public class Player {
         this.moveDown = value;
     }
 
-    public void setBlockedAreas(List<Rectangle> blockedAreas) {
+    public void setBlockedAreas(@Nullable List<Rectangle> blockedAreas) {
         this.blockedAreas = blockedAreas == null ? Collections.emptyList() : blockedAreas;
     }
 
-    public Rectangle getBounds() {
+    public @NotNull Rectangle getBounds() {
         return new Rectangle((int) Math.round(x), (int) Math.round(y), Math.max(1, lastDrawW), Math.max(1, lastDrawH));
     }
 
@@ -105,7 +114,7 @@ public class Player {
         return heldFruit != null;
     }
 
-    public String getHeldItemName() {
+    public @Nullable String getHeldItemName() {
         return heldFruit == null ? null : heldFruit.name();
     }
 
@@ -113,23 +122,64 @@ public class Player {
         this.heldFruit = new FruitState(name, "", 0L, 1, name, icon);
     }
 
-    public void setHeldFruit(FruitState fruit) {
+    public void setHeldFruit(@Nullable FruitState fruit) {
         this.heldFruit = fruit;
+    }
+
+    public @Nullable FruitState getHeldFruit() {
+        return heldFruit;
     }
 
     public void clearHeldItem() {
         this.heldFruit = null;
     }
 
-    public boolean useHeldItem() {
-        if (!hasHeldItem()) {
-            return false;
-        }
-        clearHeldItem();
-        return true;
+    public void resetStatusForNewStart() {
+        this.hunger = MAX_HUNGER;
     }
 
-    public void draw(Graphics2D g2, int width, int height, Component observer) {
+    public int getHunger() {
+        return (int) Math.round(clamp(hunger, MIN_HUNGER, MAX_HUNGER));
+    }
+
+    public boolean isStarving() {
+        return getHunger() <= 0;
+    }
+
+    public void tickHunger(double deltaSec) {
+        if (deltaSec <= 0D) {
+            return;
+        }
+        hunger = clamp(hunger - (HUNGER_DECAY_PER_SEC * deltaSec), MIN_HUNGER, MAX_HUNGER);
+    }
+
+    public int recoverHungerFromFruit(@Nullable FruitState fruit) {
+        if (fruit == null) {
+            return 0;
+        }
+        long weight = Math.max(0L, fruit.weight());
+        int gainByWeight = (int) Math.max(8L, Math.min(45L, (weight + 9L) / 10L));
+        String lower = fruit.name() == null ? "" : fruit.name().toLowerCase();
+        int bonus = lower.contains("perfect") ? 10 : (lower.contains("ripe") ? 5 : 0);
+        return recoverHunger(gainByWeight + bonus);
+    }
+
+    public int recoverHunger(int amount) {
+        int before = getHunger();
+        hunger = clamp(hunger + Math.max(0, amount), MIN_HUNGER, MAX_HUNGER);
+        return getHunger() - before;
+    }
+
+    public void useHeldItem() {
+        if (!hasHeldItem()) {
+            return;
+        }
+        String usedName = Objects.requireNonNull(heldFruit).name();
+        clearHeldItem();
+        ActionLogCsv.logEvent("use", usedName, "held item consumed by long SPACE press");
+    }
+
+    public void draw(@NotNull Graphics2D g2, int width, int height, Component observer) {
         int drawW = Math.max(40, (int) Math.round((width / 13.0) * PLAYER_SCALE));
         int drawH = Math.max(40, (int) Math.round((height / 8.0) * PLAYER_SCALE));
         this.lastDrawW = drawW;
@@ -152,6 +202,8 @@ public class Player {
         }
         double deltaSec = (now - lastUpdateAt) / 1000.0;
         lastUpdateAt = now;
+
+        tickHunger(deltaSec);
 
         updatePosition(deltaSec, minX, maxX, minY, maxY, drawW, drawH);
         boolean movingHorizontally = moveLeft ^ moveRight;
@@ -178,7 +230,8 @@ public class Player {
     }
 
     private void updatePosition(double deltaSec, int minX, int maxX, int minY, int maxY, int drawW, int drawH) {
-        double distance = SPEED_PX_PER_SEC * deltaSec;
+        double speed = isStarving() ? SPEED_PX_PER_SEC * STARVING_SPEED_MULTIPLIER : SPEED_PX_PER_SEC;
+        double distance = speed * deltaSec;
 
         double nextX = x;
         double nextY = y;
@@ -186,20 +239,24 @@ public class Player {
         if (moveLeft && !moveRight) {
             nextX -= distance;
             facing = Direction.LEFT;
+            tickHunger(deltaSec);
         } else {
             if (moveRight && !moveLeft) {
                 nextX += distance;
                 facing = Direction.RIGHT;
+                tickHunger(deltaSec);
             }
         }
 
         if (moveUp && !moveDown) {
             nextY -= distance;
             facing = Direction.UP;
+            tickHunger(deltaSec);
         } else {
             if (moveDown && !moveUp) {
                 nextY += distance;
                 facing = Direction.DOWN;
+                tickHunger(deltaSec);
             }
         }
 
@@ -207,11 +264,11 @@ public class Player {
         nextY = clamp(nextY, minY, maxY);
 
         // X軸移動を先に適用し、障害物に当たるならキャンセル
-        if (!collides(nextX, y, drawW, drawH)) {
+        if (collides(nextX, y, drawW, drawH)) {
             x = nextX;
         }
         // Y軸移動を次に適用し、障害物に当たるならキャンセル
-        if (!collides(x, nextY, drawW, drawH)) {
+        if (collides(x, nextY, drawW, drawH)) {
             y = nextY;
         }
     }
@@ -231,18 +288,18 @@ public class Player {
 
     private boolean collides(double testX, double testY, int drawW, int drawH) {
         if (blockedAreas.isEmpty()) {
-            return false;
+            return true;
         }
         Rectangle me = new Rectangle((int) Math.round(testX), (int) Math.round(testY), drawW, drawH);
         for (Rectangle blocked : blockedAreas) {
             if (blocked != null && me.intersects(blocked)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
-    private void drawHeldItem(Graphics2D g2, Component observer, int drawW, int drawH) {
+    private void drawHeldItem(@NotNull Graphics2D g2, Component observer, int drawW, int drawH) {
         if (heldFruit == null || heldFruit.icon() == null) {
             return;
         }
@@ -250,9 +307,8 @@ public class Player {
             return;
         }
 
-        // 指定座標 (21,153) を正規化した近似位置に表示。
-        int holdX = (int) Math.round(x + drawW * 0.22);
-        int holdY = (int) Math.round(y + drawH * 0.80);
+        int holdX = (int) Math.round(x + drawW * 0.22 + 2);
+        int holdY = (int) Math.round(y + drawH * 0.80 + 10);
         int itemW = Math.max(16, drawW / 4);
         int itemH = Math.max(16, drawH / 4);
         g2.drawImage(heldFruit.icon(), holdX, holdY, itemW, itemH, observer);

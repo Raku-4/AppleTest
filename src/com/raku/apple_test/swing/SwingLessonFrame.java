@@ -4,6 +4,8 @@
  */
 package com.raku.apple_test.swing;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 
@@ -24,9 +26,9 @@ import java.awt.BorderLayout;
  * </ul>
  */
 public class SwingLessonFrame {
-    private final JFrame frame;
-    private final SwingBackgroundPanel backgroundPanel;
-    private final SwingControlPanel controlPanel;
+    private final @NotNull JFrame frame;
+    private final @NotNull SwingBackgroundPanel backgroundPanel;
+    private final @NotNull SwingControlPanel controlPanel;
 
     public SwingLessonFrame() {
         // 1) 画面の土台を作る

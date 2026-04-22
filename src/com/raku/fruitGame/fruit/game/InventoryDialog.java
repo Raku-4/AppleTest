@@ -1,6 +1,7 @@
 package com.raku.fruitGame.fruit.game;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -24,16 +27,18 @@ public class InventoryDialog extends JDialog {
     private static final String INVENTORY_BG = "assets/fruitGame/textures/misc/inventory.png";
     private static final String RIGHT_ARROW = "assets/fruitGame/textures/misc/right_arrow.png";
 
-    private final InventoryPanel inventoryPanel;
-    private final JButton nextButton;
-    private final JButton prevButton;
+    private final @NotNull InventoryPanel inventoryPanel;
+            private static final Path CSV_PATH = Path.of("fruit_history.csv");
+
+    private final @NotNull JButton nextButton;
+    private final @NotNull JButton prevButton;
     private final Consumer<FruitState> confirmCallback;
 
     private final List<FruitState> items = new ArrayList<>();
     private int page;
     private int selectedIndex = -1;
 
-    public InventoryDialog(JFrame owner, BiConsumer<String, Image> confirmCallback) {
+    public InventoryDialog(JFrame owner, @Nullable BiConsumer<String, Image> confirmCallback) {
         this(owner, state -> {
             if (confirmCallback != null) {
                 confirmCallback.accept(state.name(), state.icon());
@@ -54,6 +59,7 @@ public class InventoryDialog extends JDialog {
         prevButton.addActionListener(ignored -> {
             if (page > 0) {
                 page--;
+                SoundPlayer.playUi("page.wav");
                 refreshControls();
                 inventoryPanel.repaint();
             }
@@ -63,6 +69,7 @@ public class InventoryDialog extends JDialog {
         nextButton.addActionListener(ignored -> {
             if (page < maxPage()) {
                 page++;
+                SoundPlayer.playUi("page.wav");
                 refreshControls();
                 inventoryPanel.repaint();
             }
@@ -83,16 +90,23 @@ public class InventoryDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 confirmSelection();
+                SoundPlayer.playUi("close.wav");
                 setVisible(false);
             }
         });
     }
 
     public void open() {
+        try {
+            com.raku.fruitGame.fruit.functionalClass.utility.FruitHistory.loadCsv(CSV_PATH);
+        } catch (IOException ignored) {
+            // CSV未作成時でもインベントリ表示は継続
+        }
         loadItemsFromCsv();
         page = 0;
         selectedIndex = -1;
         refreshControls();
+        SoundPlayer.playUi("open.wav");
         setVisible(true);
     }
 
@@ -192,7 +206,7 @@ public class InventoryDialog extends JDialog {
                 }
 
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mouseClicked(@NotNull MouseEvent e) {
                     selectItem(e.getX(), e.getY());
                 }
 
@@ -207,7 +221,7 @@ public class InventoryDialog extends JDialog {
         }
 
         @Override
-        protected void paintComponent(Graphics g) {
+        protected void paintComponent(@NotNull Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -256,19 +270,19 @@ public class InventoryDialog extends JDialog {
             g2.setColor(selected ? new Color(255, 215, 0) : new Color(0, 0, 0, 20));
             g2.drawRoundRect(x + 3, y + 3, w - 6, h - 6, 10, 10);
 
-            int iconW = Math.max(28, w / 3);
-            int iconH = Math.max(28, h / 3);
+            int iconW = Math.max(110, w - 22);
+            int iconH = Math.max(110, h - 46);
             int iconX = x + (w - iconW) / 2;
-            int iconY = y + 10;
+            int iconY = y + 6;
 
             if (item.icon() != null) {
                 g2.drawImage(item.icon(), iconX, iconY, iconW, iconH, this);
             }
 
             g2.setColor(new Color(30, 30, 30));
-            g2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+            g2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
             String qty = "x" + item.quantity();
-            g2.drawString(qty, x + w - 30, y + h - 12);
+            g2.drawString(qty, x + w - 42, y + h - 12);
         }
 
         private void drawPageLabel(@NotNull Graphics2D g2, int panelW, int y) {
@@ -338,10 +352,13 @@ public class InventoryDialog extends JDialog {
                 }
             }
             selectedIndex = index;
+            if (index >= 0) {
+                SoundPlayer.playUi("select.wav");
+            }
             repaint();
         }
 
-        private void drawHoverTooltip(Graphics2D g2) {
+        private void drawHoverTooltip(@NotNull Graphics2D g2) {
             if (hoverIndex < 0 || hoverIndex >= items.size()) {
                 return;
             }

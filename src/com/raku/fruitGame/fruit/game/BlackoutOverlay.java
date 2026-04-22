@@ -1,6 +1,10 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.*;
+import java.util.Objects;
 import java.util.Random;
 
 public class BlackoutOverlay {
@@ -10,7 +14,7 @@ public class BlackoutOverlay {
     private final long holdMillis;
     private long startedAt;
 
-    private float[][] speedMap;
+    private float[] @Nullable [] speedMap;
 
     private int cols = -1;
     private int rows = -1;
@@ -44,7 +48,7 @@ public class BlackoutOverlay {
         return false;
     }
 
-    public void paint(Graphics2D g2, int width, int height) {
+    public void paint(@NotNull Graphics2D g2, int width, int height) {
         if (startedAt == 0L || width <= 0 || height <= 0) {
             return;
         }
@@ -63,7 +67,7 @@ public class BlackoutOverlay {
 
         for (int ty = 0; ty < rows; ty++) {
             for (int tx = 0; tx < cols; tx++) {
-                float speed = speedMap[ty][tx];
+                float speed = Objects.requireNonNull(speedMap[ty])[tx];
                 float alpha01;
 
                 if (elapsed < phase1End) {
@@ -107,7 +111,7 @@ public class BlackoutOverlay {
 
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
-                speedMap[y][x] = 0.55f + random.nextFloat() * 1.20f;
+                Objects.requireNonNull(speedMap[y])[x] = 0.55f + random.nextFloat() * 1.20f;
             }
         }
     }

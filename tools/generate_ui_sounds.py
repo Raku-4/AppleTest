@@ -72,6 +72,9 @@ write_sequence(os.path.join(OUT_DIR, "open.wav"), [([660.0], 0.06), ([990.0], 0.
 write_sequence(os.path.join(OUT_DIR, "close.wav"), [([990.0], 0.06), ([660.0], 0.08)])
 write_tone(os.path.join(OUT_DIR, "select.wav"), [1200.0], 0.05)
 write_sequence(os.path.join(OUT_DIR, "page.wav"), [([740.0], 0.04), ([880.0], 0.05)])
+write_sequence(os.path.join(OUT_DIR, "fertilize.wav"), [([520.0], 0.05), ([660.0], 0.06), ([780.0], 0.08)])
+write_sequence(os.path.join(OUT_DIR, "harvest.wav"), [([1040.0], 0.04), ([1310.0], 0.05), ([1560.0], 0.06)])
+write_tone(os.path.join(OUT_DIR, "type_tick.wav"), [1760.0], 0.018)
 
 print("generated:", OUT_DIR)
 

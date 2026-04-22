@@ -4,6 +4,8 @@
  */
 package com.raku.apple_test.swing;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.Timer;
 
 /**
@@ -15,9 +17,9 @@ import javax.swing.Timer;
  * <p>このクラスの責務は「一定間隔で {@code repaint()} を呼ぶ」ことだけです。</p>
  */
 public class SwingDemoTimer {
-    private final Timer timer;
+    private final @NotNull Timer timer;
 
-    public SwingDemoTimer(SwingBackgroundPanel panel) {
+    public SwingDemoTimer(@NotNull SwingBackgroundPanel panel) {
         // 16ms ごとに repaint() すると、だいたい 60fps くらいの見た目になります。
         // 1000ms / 16ms ≒ 62.5 回/秒
         this.timer = new Timer(16, _ -> panel.repaint());

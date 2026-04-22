@@ -1,5 +1,7 @@
 package com.raku.apple_test.generics;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * ジェネリクス学習用のばななモデル。
  *
@@ -65,7 +67,7 @@ public class GenericsBanana<TColor> {
         return this.weight;
     }
 
-    public String describe() {
+    public @NotNull String describe() {
         return "名前=" + name + ", 色=" + getColor() + ", 重さ=" + weight + "g, 食べた量=" + ate + "g, 残り=" + remaining() + "g";
     }
 }

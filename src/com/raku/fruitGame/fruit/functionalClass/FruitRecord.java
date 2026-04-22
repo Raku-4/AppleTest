@@ -1,5 +1,7 @@
 package com.raku.fruitGame.fruit.functionalClass;
 
+import com.raku.fruitGame.fruit.game.FruitStage;
+
 /**
  * 果物生成履歴の1件を表す不変データ。
  *
@@ -15,7 +17,7 @@ public record FruitRecord(
 		String color,
 		long weight,
 		String taste,
-		String maturity,
+		FruitStage maturity,
 		long elapsedSeconds,
 		int treeId
 ) {

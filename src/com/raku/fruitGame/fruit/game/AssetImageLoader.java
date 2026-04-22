@@ -1,5 +1,8 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.imageio.ImageIO;
 import java.awt.Image;
 import java.io.File;
@@ -19,14 +22,14 @@ public final class AssetImageLoader {
     private AssetImageLoader() {
     }
 
-    public static Image load(String resourcePath) {
+    public static Image load(@Nullable String resourcePath) {
         if (resourcePath == null || resourcePath.isEmpty()) {
             return null;
         }
         return CACHE.computeIfAbsent(resourcePath, AssetImageLoader::loadUncached);
     }
 
-    private static Image loadUncached(String resourcePath) {
+    private static @Nullable Image loadUncached(@NotNull String resourcePath) {
         Image image = loadFromClasspath(resourcePath);
         if (image != null) {
             return image;
@@ -34,7 +37,7 @@ public final class AssetImageLoader {
         return loadFromFileSystem(resourcePath);
     }
 
-    private static Image loadFromClasspath(String resourcePath) {
+    private static @Nullable Image loadFromClasspath(@NotNull String resourcePath) {
         String normalized = resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath;
         try (InputStream stream = AssetImageLoader.class.getClassLoader().getResourceAsStream(normalized)) {
             if (stream == null) {
@@ -46,7 +49,7 @@ public final class AssetImageLoader {
         }
     }
 
-    private static Image loadFromFileSystem(String resourcePath) {
+    private static @Nullable Image loadFromFileSystem(@NotNull String resourcePath) {
         String normalized = resourcePath.replace("/", File.separator);
         File file = new File("src" + File.separator + "resources" + File.separator + normalized);
         if (!file.exists()) {

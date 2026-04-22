@@ -3,7 +3,6 @@ package com.raku.apple_test.matrix;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.ToIntFunction;
 // import java.util.function.ToIntFunction;
 
 @SuppressWarnings({"FieldMayBeFinal", "Convert2MethodRef"})
@@ -256,7 +255,7 @@ public class AppleMatrix {
         }
 
     /** 画面座標（左上が(0,0)) で一文字を置く */
-    public static void setCharScreen(char[]  @NotNull [] g, int row, int col) {
+    public static void setCharScreen(char[] @NotNull [] g, int row, int col) {
         if (row < 0 || row >= g.length) return;
         if (col < 0 || col >= g[row].length) return;
         // どちらも範囲外なら操作を行わずにreturn する。

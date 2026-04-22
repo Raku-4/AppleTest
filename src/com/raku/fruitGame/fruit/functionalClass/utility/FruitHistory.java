@@ -1,8 +1,10 @@
 package com.raku.fruitGame.fruit.functionalClass.utility;
 
 import com.raku.fruitGame.fruit.functionalClass.FruitRecord;
+import com.raku.fruitGame.fruit.game.FruitStage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.IOException;
@@ -11,13 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 果物生成履歴を管理するクラス。
@@ -46,7 +42,7 @@ public class FruitHistory {
      * 完全一致レコードは重複として無視します。
      */
     public static void recordCreation(String fruitName, String color, long weight) {
-        recordCreation(fruitName, color, weight, "", "通常", 0L, -1);
+        recordCreation(fruitName, color, weight, "", FruitStage.RIPE, 0L, -1);
     }
 
     public static void recordCreation(
@@ -54,7 +50,7 @@ public class FruitHistory {
             String color,
             long weight,
             String taste,
-            String maturity,
+            FruitStage maturity,
             long elapsedSeconds,
             int treeId
     ) {
@@ -77,7 +73,7 @@ public class FruitHistory {
         cleanupEmptyFruits();
     }
 
-    public static FruitRecord findLatestBagRecord(String fruitName) {
+    public static @Nullable FruitRecord findLatestBagRecord(String fruitName) {
         List<FruitRecord> list = history.get(fruitName);
         if (list == null || list.isEmpty()) {
             return null;
@@ -127,7 +123,7 @@ public class FruitHistory {
             String color,
             long weight,
             String taste,
-            String maturity,
+            FruitStage maturity,
             long elapsedSeconds
     ) {
         removeTreeRecord(treeId);
@@ -171,7 +167,7 @@ public class FruitHistory {
      * 現在の履歴を CSV として保存します。
      * フォーマット: timestamp,fruitName,color,weight
      */
-    public static void saveCsv(Path path) throws IOException {
+    public static void saveCsv(@NotNull Path path) throws IOException {
         List<String> lines = new ArrayList<>();
         lines.add("timestamp,fruitName,color,weight,taste,maturity,elapsedSeconds,treeId");
 
@@ -190,7 +186,7 @@ public class FruitHistory {
                     + csv(record.color()) + ","
                     + record.weight() + ","
                     + csv(record.taste()) + ","
-                    + csv(record.maturity()) + ","
+                    + record.maturity().toString() + ","
                     + record.elapsedSeconds() + ","
                     + record.treeId());
         }
@@ -201,7 +197,7 @@ public class FruitHistory {
     /**
      * fruitNames 同期が不要な呼び出し用オーバーロード。
      */
-    public static void loadCsv(Path path) throws IOException {
+    public static void loadCsv(@NotNull Path path) throws IOException {
         loadCsv(path, null);
     }
 
@@ -209,7 +205,7 @@ public class FruitHistory {
      * CSV を読み込み、履歴を再構築します。
      * fruitNames が渡された場合は、そこにも果物名を同期します。
      */
-    public static void loadCsv(Path path, List<String> fruitNames) throws IOException {
+    public static void loadCsv(@NotNull Path path, @Nullable List<String> fruitNames) throws IOException {
         // 初回起動などでファイルがない場合は何もしません。
         if (!Files.exists(path)) {
             return;
@@ -237,7 +233,7 @@ public class FruitHistory {
             String color = unCsv(cols.get(2));
             long weight;
             String taste = "";
-            String maturity = "通常";
+            FruitStage maturity = FruitStage.RIPE;
             long elapsedSeconds = 0L;
             int treeId = -1;
             try {
@@ -248,7 +244,7 @@ public class FruitHistory {
 
             if (cols.size() >= 8) {
                 taste = unCsv(cols.get(4));
-                maturity = unCsv(cols.get(5));
+                maturity = Arrays.stream(FruitStage.values()).filter(fruitStage -> Objects.equals(fruitStage.toString(), cols.get(5))).findFirst().orElse(FruitStage.EMPTY);
                 try {
                     elapsedSeconds = Long.parseLong(unCsv(cols.get(6)));
                 } catch (NumberFormatException ignored) {
@@ -260,10 +256,15 @@ public class FruitHistory {
             }
 
             recordCreation(fruitName, color, weight, taste, maturity, elapsedSeconds, treeId);
-            if (fruitNames != null && !fruitNames.contains(fruitName)) {
+            if (fruitNames != null) {
                 fruitNames.add(fruitName);
             }
         }
+    }
+
+    public static void resetCsv(@NotNull Path path) {
+        history.clear();
+        path.toFile().deleteOnExit();
     }
 
     /**
@@ -273,7 +274,7 @@ public class FruitHistory {
      * 項目全体を "..." で囲みます。</p>
      */
     @Contract(pure = true)
-    private static @NotNull String csv(String text) {
+    private static @NotNull String csv(@Nullable String text) {
         if (text == null) {
             return "\"\"";
         }
@@ -285,7 +286,7 @@ public class FruitHistory {
      * csv() の逆変換。
      * 前後の引用符を剥がし、"" を " に戻します。
      */
-    private static @NotNull String unCsv(String text) {
+    private static @NotNull String unCsv(@Nullable String text) {
         if (text == null || text.isEmpty()) {
             return "";
         }

@@ -102,7 +102,7 @@ public final class SwingAssetLoader {
      * <p>【メリット】<br>
      * 同じ画像を何度も読み込まないから、パフォーマンスが良くなります。</p>
      */
-    public static Image load(String resourcePath) {
+    public static Image load(@Nullable String resourcePath) {
         if (resourcePath == null || resourcePath.isEmpty()) {
             // null や空文字列が来たら、読み込みようがないので null を返す
             return null;
@@ -120,7 +120,7 @@ public final class SwingAssetLoader {
      * 2 つを試します。
      * 最初に見つかったほうを返します。</p>
      */
-    private static Image loadUncached(String resourcePath) {
+    private static @Nullable Image loadUncached(@NotNull String resourcePath) {
         Image image = loadFromClasspath(resourcePath);
         // classpath から探す試みが成功したか？
         if (image != null) {

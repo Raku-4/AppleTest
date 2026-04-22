@@ -1,5 +1,7 @@
 package com.raku.apple_test.generics;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
@@ -91,7 +93,7 @@ public class MainGenerics {
      * <p><? extends GenericsApple<?>> を使うことで、
      * "GenericsApple の子孫なら何でも受け取る" ことができます。</p>
      */
-    private static void printAppleShelf(List<? extends GenericsApple<?>> apples) {
+    private static void printAppleShelf(@NotNull List<? extends GenericsApple<?>> apples) {
         System.out.println("-- Apple Shelf --");
         for (GenericsApple<?> apple : apples) {
             System.out.println(apple.describe());
@@ -101,7 +103,7 @@ public class MainGenerics {
     /**
      * ばななの一覧を表示します。
      */
-    private static void printBananaShelf(List<? extends GenericsBanana<?>> bananas) {
+    private static void printBananaShelf(@NotNull List<? extends GenericsBanana<?>> bananas) {
         System.out.println("-- Banana Shelf --");
         for (GenericsBanana<?> banana : bananas) {
             System.out.println(banana.describe());

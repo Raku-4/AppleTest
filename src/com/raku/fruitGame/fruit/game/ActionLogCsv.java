@@ -1,5 +1,8 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -36,7 +39,7 @@ public final class ActionLogCsv {
         }
     }
 
-    private static String csv(String value) {
+    private static @NotNull String csv(@Nullable String value) {
         if (value == null) {
             return "\"\"";
         }

@@ -1,5 +1,7 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,7 +18,7 @@ public final class FertilizerCsv {
     private FertilizerCsv() {
     }
 
-    public static void save(Path path, Map<Integer, Long> elapsedByTree) throws IOException {
+    public static void save(@NotNull Path path, @NotNull Map<Integer, Long> elapsedByTree) throws IOException {
         List<String> lines = new ArrayList<>();
         lines.add("treeId,elapsedSeconds");
         for (Map.Entry<Integer, Long> entry : elapsedByTree.entrySet()) {
@@ -25,7 +27,7 @@ public final class FertilizerCsv {
         Files.write(path, lines, StandardCharsets.UTF_8);
     }
 
-    public static Map<Integer, Long> load(Path path) throws IOException {
+    public static @NotNull Map<Integer, Long> load(@NotNull Path path) throws IOException {
         Map<Integer, Long> out = new LinkedHashMap<>();
         if (!Files.exists(path)) {
             return out;

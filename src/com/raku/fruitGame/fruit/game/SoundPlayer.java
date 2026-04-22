@@ -1,5 +1,8 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -13,6 +16,9 @@ import java.nio.file.Path;
  * 軽量な操作音プレイヤー。wav が無い場合はビープ音で代替します。
  */
 public final class SoundPlayer {
+    private static Clip typeTickClip;
+    private static boolean typeTickTried;
+
     private SoundPlayer() {
     }
 
@@ -27,15 +33,11 @@ public final class SoundPlayer {
             Clip clip = AudioSystem.getClip();
             clip.open(in);
             clip.addLineListener(event -> {
-                switch (event.getType()) {
-                    case STOP -> {
-                        clip.close();
-                        try {
-                            in.close();
-                        } catch (Exception ignored) {
-                        }
-                    }
-                    default -> {
+                if (event.getType() == javax.sound.sampled.LineEvent.Type.STOP) {
+                    clip.close();
+                    try {
+                        in.close();
+                    } catch (Exception ignored) {
                     }
                 }
             });
@@ -45,7 +47,46 @@ public final class SoundPlayer {
         }
     }
 
-    private static AudioInputStream openAudio(String resourcePath) {
+    public static synchronized void playTypeTick(char ch) {
+        if (Character.isWhitespace(ch)) {
+            return;
+        }
+        Clip clip = getTypeTickClip();
+        if (clip == null) {
+            return;
+        }
+        try {
+            if (clip.isRunning()) {
+                clip.stop();
+            }
+            clip.setFramePosition(0);
+            clip.start();
+        } catch (Exception ignored) {
+            // タイプ音が鳴らなくても本文表示は継続
+        }
+    }
+
+    private static @Nullable Clip getTypeTickClip() {
+        if (typeTickTried) {
+            return typeTickClip;
+        }
+        typeTickTried = true;
+        try {
+            AudioInputStream in = openAudio("assets/fruitGame/sounds/type_tick.wav");
+            if (in == null) {
+                return null;
+            }
+            Clip clip = AudioSystem.getClip();
+            clip.open(in);
+            in.close();
+            typeTickClip = clip;
+            return typeTickClip;
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static @Nullable AudioInputStream openAudio(@NotNull String resourcePath) {
         try {
             InputStream classpath = SoundPlayer.class.getClassLoader().getResourceAsStream(resourcePath);
             if (classpath != null) {

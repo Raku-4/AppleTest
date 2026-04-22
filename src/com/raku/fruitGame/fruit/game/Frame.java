@@ -1,17 +1,20 @@
 package com.raku.fruitGame.fruit.game;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
 public class Frame {
-    private final JFrame frame;
-    private final Background background;
-    private final ControlPanel controlPanel;
+    private final @NotNull JFrame frame;
+    private final @NotNull Background background;
+    private final @NotNull ControlPanel controlPanel;
 
     public Frame() throws IOException {
         this.frame = new JFrame("FruitGame");
         this.background = new Background();
+        background.gotoOrchard();
         this.controlPanel = new ControlPanel(background, frame);
         initializeFrame();
     }
